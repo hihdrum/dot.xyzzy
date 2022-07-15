@@ -1,0 +1,69 @@
+; 事前に環境変数XHZZYHOMEを設定している。
+
+;(require "ni/setup")
+;(ni-autoload)
+
+; ウインドウの移動
+(global-set-key #\M-o 'other-window)
+(global-set-key #\M-O 'move-previous-window)
+
+; xyzzyの移動
+(global-set-key #\F9 'next-xyzzy-window)
+
+(require "xl-repl")
+
+; xl-repl の :reference 設定
+(setq repl.command.reference::*reference-directory* "F:/makoto/app/xyzzy-0.2.2.253/xyzzy/reference")
+
+;--------------------------------------------------------------------------------
+; viewmodeのadd-hook
+;--------------------------------------------------------------------------------
+(require "viewmode")
+
+(let ((direction 'forward))
+  (defun search-forward% ()
+	(interactive)
+	(setq direction 'forward)
+	(call-interactively 'search-forward))
+
+  (defun search-backward% ()
+	(interactive)
+	(setq direction 'backward)
+	(call-interactively 'search-backward))
+
+  (defun repeat-normal-direction-search ()
+	(interactive)
+	(if (eq direction 'forward)
+		(repeat-forward-search)
+	  (repeat-backward-search)))
+
+  (defun repeat-reverse-direction-search ()
+	(interactive)
+	(if (eq direction 'forward)
+		(repeat-backward-search)
+	  (repeat-forward-search))))
+
+(defun view-mode-hook ()
+
+  ; 移動
+  (define-key *view-mode-map* #\h 'backward-char)
+  (define-key *view-mode-map* #\j 'next-line)
+  (define-key *view-mode-map* #\k 'previous-line)
+  (define-key *view-mode-map* #\l 'forward-char)
+
+  (define-key *view-mode-map* #\y 'backward-word)
+  (define-key *view-mode-map* #\o 'forward-word)
+  
+  (define-key *view-mode-map* #\u 'next-page)
+  (define-key *view-mode-map* #\i 'previous-page)
+
+  (define-key *view-mode-map* #\g 'goto-line)
+  
+  ; 検索
+  (define-key *view-mode-map* #\/ 'search-forward%)
+  (define-key *view-mode-map* #\? 'search-backward%)
+  (define-key *view-mode-map* #\n 'repeat-normal-direction-search)
+  (define-key *view-mode-map* #\N 'repeat-reverse-direction-search)
+  )
+
+(add-hook '*view-mode-hook* 'view-mode-hook)
